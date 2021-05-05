@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include <conio.h>
 
 #define TOKEN_MAX 100
 #define VAR_MAX 10
@@ -44,7 +43,7 @@ void Error(const char mesg[])
 {
 	printf(mesg);
 	printf("-----------Fatal Error-----------\n");
-	_getch();
+//	_getch();
 }
 
 int SearchNonFinal(Token_t tokenList[], int start, int finish)
@@ -306,9 +305,11 @@ int ResolveTree(Node_t* tree)
 	return value;
 }
 
-int main(void)
+#define codeSize 4
+
+int oldmain(void)
 {
-	constexpr int codeSize = 4;
+	//constexpr int codeSize = 4;
 	char input[codeSize][50] = {  "0 COUNT = 1                \n",
 								  "1 COUNT = COUNT + 1        \n",
 								  "2 IF COUNT<99 THEN GOTO 1  \n",
@@ -333,6 +334,163 @@ int main(void)
 
 	printf("--------End-------\n");
 
-	_getch();
+//	_getch();
+	return 0;
+}
+
+
+#define TEXT_BUFFER 1000
+
+void savefile(char text[TEXT_BUFFER][TEXT_BUFFER])
+{
+	FILE *file = NULL;
+	file = fopen("program.bas","w");
+	if (file == NULL) {
+		printf("Error open file\n");
+		return;
+	}
+
+	for(int i=0;i<TEXT_BUFFER;i++){
+		fprintf(file,"%s",text[i]);
+	}
+
+	fclose(file);
+}
+
+void readfile(char text[TEXT_BUFFER][TEXT_BUFFER])
+{
+	FILE *file = NULL;
+	file = fopen("program.bas","r");
+	if(file == NULL){
+		printf("Error can't open file");
+		return;
+	}
+
+	fseek(file,0,SEEK_SET);
+
+	for(int i = 0; i < TEXT_BUFFER; i++){
+		fscanf(file,"%s",text[i]);
+	}
+
+	fclose(file);
+}
+
+
+int main()
+{
+	char text[TEXT_BUFFER][TEXT_BUFFER];
+	char buffer[TEXT_BUFFER];
+	char run = 1;
+	char debug = 0;
+
+	memset(text,0,sizeof(char)*TEXT_BUFFER*TEXT_BUFFER);
+	memset(buffer,0,sizeof(char)*TEXT_BUFFER);
+	printf("Init basic editor\n");
+	int x = 0;
+	while(run){
+		char character = getchar();
+
+		if (character == '\n'){
+			buffer[x] = '\n';
+			if (strcmp("list\n",buffer) == 0){
+				printf("---List---\n");
+				if (debug) printf("debug list detected");
+				for(int i = 0; i <= TEXT_BUFFER; i++){
+					printf("%s",text[i]);
+				}
+			}else if (strcmp("save\n",buffer) == 0){
+				savefile(text);
+				printf("File save...\n");
+			}else if (strcmp("quit\n",buffer) == 0){
+				printf("Exit text editor...\n");
+				run = 0;
+				break;
+			}else if (strcmp("load\n",buffer) == 0 ){
+				printf("Loading file...\n");
+				readfile(text);
+			}else if ( strcmp("clear\n",buffer) == 0) {
+				system("clear");
+			}else if ( strcmp("run\n",buffer) == 0) {
+
+/*
+	char input[codeSize][50] = {  "0 COUNT = 1                \n",
+								  "1 COUNT = COUNT + 1        \n",
+								  "2 IF COUNT<99 THEN GOTO 1  \n",
+								  "3 PRINT COUNT              \n",
+	};
+*/
+	//for (int i = 0; i < codeSize; i++) printf(input[i]);
+	//for (int i = 0; i < 3; i++) printf("\n");
+	//printf("OUT PROGRAM: \n");
+
+	Token_t tokens[TEXT_BUFFER][TOKEN_MAX];
+	for (int i = 0 , j = 0; i < TEXT_BUFFER; i++ , j++) {
+		if (text[i][0] = 0) {
+			i++;
+			continue;
+		}
+		GenLexer(&tokens[i][0], input[i], strlen(input[i]));
+	}
+
+	Node_t* parsertree[TEXT_BUFFER] = { NULL };
+	for (int i = 0; i < codeSize; i++) Parse(parsertree[i], &tokens[i][0], 1, TOKEN_MAX);
+
+	while (running == TRUE) {
+		ResolveTree(parsertree[ExecuteLine]);
+		BranchActivate == TRUE ? BranchActivate = FALSE : ExecuteLine++;
+		if (ExecuteLine > codeSize - 1) running = FALSE;
+	}
+
+	printf("--------End-------\n");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			}else{
+				if( buffer[0] >= '0' && buffer[0] <='9'){
+					int counter = 0;
+					while( buffer[counter] != '\n' && buffer[counter]>='0' && buffer[counter]<='9' ){
+						counter++;
+					}
+					if (buffer[counter] != ' '){
+						printf("Inmediate value for basic interpreter\n");
+					}else{
+						int lineNumber = atoi(buffer);
+						if (lineNumber >= TEXT_BUFFER){
+							printf("Error buffer overflow\n");
+							exit(-1);
+						}
+						memcpy(text[lineNumber],buffer,sizeof(char)*TEXT_BUFFER);
+					}
+				}else{
+					printf("syntax error\n");
+				}
+			}
+			memset(buffer,0,sizeof(char)*TEXT_BUFFER);
+			x=0;
+			continue;
+		}
+
+		buffer[x] = character;
+		x++;
+	}
 	return 0;
 }

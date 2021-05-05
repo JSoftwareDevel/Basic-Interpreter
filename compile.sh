@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc -O0 main.c -o editor && ./editor
+g++ -O0 main.cpp -o editor && ./editor

@@ -18,6 +18,7 @@ RUN //Ejecuta el programa
 
 Ejemplo de codigo BASIC:
 
+
 0 COUNT = 1
 10 COUNT = COUNT + 1
 20 IF COUNT<99 THEN GOTO 1

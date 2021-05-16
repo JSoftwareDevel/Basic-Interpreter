@@ -1,3 +1,2 @@
 #!/bin/bash
-
-g++ -O0 main.cpp -o editor && ./editor
+g++  -O0 -fpermissive editor.cpp interpreter.cpp main.cpp -o editor && ./editor
